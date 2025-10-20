@@ -16,34 +16,33 @@ program
 program.parse(process.argv);
 const options = program.opts();
 
-// Використовуємо синхронний existsSync, оскільки це відбувається ОДИН РАЗ при старті програми
 if (!existsSync(options.input)) {
   console.error("Cannot find input file");
   process.exit(1);
 }
 
-// --- 3. Функція обробки HTTP-запиту (Асинхронна) ---
 const requestHandler = async (req, res) => {
-  try {
+      try {
     const url = new URL(req.url, `http://${options.host}:${options.port}`);
     const survivedParam = url.searchParams.get("survived");
     const ageParam = url.searchParams.get("age");
 
-    // АСИНХРОННЕ ЧИТАННЯ ФАЙЛУ ЗА ДОПОМОГОЮ fs/promises
+    
     const rawData = await fsPromises.readFile(path.resolve(options.input), "utf8");
 
-    // Обробка даних 
+   
     const lines = rawData.trim().split("\n");
    
     let jsonArray = lines.map(line => JSON.parse(line)); 
     
 
 
-    // Фільтрація за survived (Варіант 6)
-    if (survivedParam === "true") {
-      // Фільтруємо за числовим полем Survived (1 або 0)
-      jsonArray = jsonArray.filter(p => p.Survived === 1); 
-    }
+    // Фільтрація за survived 
+if (survivedParam === "true") {
+  jsonArray = jsonArray.filter(p =>
+    p.Survived === 1 || p.Survived === "1" || p.Survived === true || p.Survived === "true"
+  );
+}
 
     // Формування об'єктів для XML
     const passengers = jsonArray.map(p => {
@@ -75,7 +74,6 @@ const requestHandler = async (req, res) => {
   }
 };
 
-// --- 4. Запуск сервера ---
 // Передаємо асинхронний обробник запиту
 const server = http.createServer(requestHandler);
 
