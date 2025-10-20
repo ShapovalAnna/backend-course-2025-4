@@ -1,13 +1,13 @@
 
 const { program } = require("commander");
 const http = require("http");
-
+const url = require('url');
 const { readFile, existsSync } = require("fs"); 
 const fsPromises = require("fs/promises");
 const path = require("path");
 const { XMLBuilder } = require("fast-xml-parser");
 
-// --- 1. Параметри командного рядка 
+
 program
   .requiredOption("-i, --input <path>", "path to input JSON file")
   .requiredOption("-h, --host <host>", "server host address")
@@ -32,12 +32,11 @@ const requestHandler = async (req, res) => {
     // АСИНХРОННЕ ЧИТАННЯ ФАЙЛУ ЗА ДОПОМОГОЮ fs/promises
     const rawData = await fsPromises.readFile(path.resolve(options.input), "utf8");
 
-    // Обробка даних (Ваша логіка)
+    // Обробка даних 
     const lines = rawData.trim().split("\n");
-    // Припускаємо, що titanic.json є цілісним масивом, а не JSON-L
+   
     let jsonArray = lines.map(line => JSON.parse(line)); 
-     // Якщо файл містить JSON-L (рядок за рядком), використовуйте:
-     // let jsonArray = lines.map(line => JSON.parse(line));
+    
 
 
     // Фільтрація за survived (Варіант 6)
